@@ -6,7 +6,7 @@
 - [x] overview
 - [x] search movie
 - [x] add movie to favorite
-- [x] delete done task 
+- [x] switch display mode
 
 
 #### Github Pages
