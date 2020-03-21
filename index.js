@@ -8,15 +8,16 @@
   const searchForm = document.getElementById('search')
   const searchInput = document.getElementById('search-input')
   const dataPanel = document.getElementById('data-panel')
-  let paginationData = []
-
-  // 右上切換清單與卡片模式
   const displayModeSwitch = document.getElementById('display-mode')
+
+  let paginationData = []
+  let modeType = 'cardMode'
+  let pageNum = 1
 
   axios.get(INDEX_URL).then((response) => {
     data.push(...response.data.results)
     getTotalPages(data)
-    getPageData(1, data)
+    getPageData(pageNum, data, modeType)
   }).catch((err) => console.log(err))
 
   //----------------- Listener ----------------- //
@@ -42,24 +43,28 @@
 
   // listen to pagination <a>
   pagination.addEventListener('click', event => {
-    if (event.target.tagName === 'A') {
-      console.log(event.target.dataset)
-      getPageData(event.target.dataset.page)
+    if (event.target.tagName === 'A' || modeType === 'cardMode') {
+      getPageData(event.target.dataset.page, data, modeType)
+    } else if (event.target.tagName === 'A' || modeType === 'listMode') {
+      getPageData(event.target.dataset.page, data, modeType)
     }
+    pageNum = event.target.dataset.page
   })
 
   // listen to switch-display-mode 
   displayModeSwitch.addEventListener('click', (event) => {
     if (event.target.matches('.fa-th')) {
-      getPageData(1, data)
+      modeType = 'cardMode'
+      getPageData(pageNum, data, modeType)
     } else if (event.target.matches('.fa-bars')) {
-      getListPageData(1, data)
+      modeType = 'listMode'
+      getPageData(pageNum, data, modeType)
     }
   })
 
   //----------------- Function ----------------- //
   // display card-mode
-  function displayDataList(data) {
+  function displayCardMode(data) {
     let htmlContent = ''
     data.forEach(function (item, index) {
       htmlContent += `
@@ -79,11 +84,12 @@
         </div>
       `
     })
+    modeType = 'cardMode'
     dataPanel.innerHTML = htmlContent
   }
 
   // display list-mode
-  function listMode(data) {
+  function displayListMode(data) {
     let htmlContent = ''
     data.forEach(function (item, index) {
       htmlContent += ` 
@@ -93,6 +99,7 @@
         </div>
         `
     })
+    modeType = 'listMode'
     dataPanel.innerHTML = htmlContent
   }
 
@@ -142,19 +149,23 @@
   }
 
   // show card-mode data by page
-  function getPageData(pageNum, data) {
+  function getPageData(pageNum, data, modeType) {
     paginationData = data || paginationData
     let offset = (pageNum - 1) * ITEM_PER_PAGE
     let pageData = paginationData.slice(offset, offset + ITEM_PER_PAGE)
-    displayDataList(pageData)
+    if (modeType === 'cardMode') {
+      displayCardMode(pageData)
+    } else if (modeType === 'listMode') {
+      displayListMode(pageData)
+    }
   }
 
-  // show list-mode data by page
-  function getListPageData(pageNum, data) {
-    paginationData = data || paginationData
-    let offset = (pageNum - 1) * ITEM_PER_PAGE
-    let pageData = paginationData.slice(offset, offset + ITEM_PER_PAGE)
-    listMode(pageData)
-  }
+  // // show list-mode data by page
+  // function getListPageData(pageNum, data) {
+  //   paginationData = data || paginationData
+  //   let offset = (pageNum - 1) * ITEM_PER_PAGE
+  //   let pageData = paginationData.slice(offset, offset + ITEM_PER_PAGE)
+  //   displayListMode(pageData)
+  // }
 
 })()
