@@ -4,7 +4,7 @@
 
 #### Features
 - [x] overview
-- [x] search movie
+- [x] search movies
 - [x] add movie to favorite
 - [x] switch display mode
 
